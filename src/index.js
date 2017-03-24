@@ -300,7 +300,7 @@
                 try {
                     return JSON.parse(data);
                 } catch (e) {
-
+                    console.error("cache get error:", e);
                 }
             }
             return data;

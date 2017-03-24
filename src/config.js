@@ -4,7 +4,9 @@
     var remoteConfig = {};
 
     remoteConfig._config = {
-        host: ""
+        host: "",
+        // 通用发送的数据
+        data: []
     };
 
     $$.config = function (c) {
@@ -45,7 +47,13 @@
             xhr.onload = function (e) {
                 var xhr = e.currentTarget;
                 if (xhr.status == 200) {
-                    p.success && p.success(JSON.parse(xhr.response));
+                    try {
+                        var jdata = JSON.parse(xhr.response);
+                        p.success && p.success(jdata);
+                    } catch (e) {
+                        console.error("server data error:", e);
+                        p.error && p.error(xhr);
+                    }
                 } else {
                     p.error && p.error(xhr);
                 }
@@ -59,6 +67,12 @@
             var sendData = [];
             for (var k in p.data) {
                 sendData.push([k, p.data[k]].join("="));
+            }
+            // 设置通用数据
+            if(remoteConfig._config.data) {
+                for(var k in remoteConfig._config.data) {
+                    sendData.push([k, remoteConfig._config.data[k]].join("="));
+                }
             }
 
             if (p.type == "GET") {
@@ -115,9 +129,9 @@
             url: [remoteConfig._config.host, '/', data.path].join(''),
             data: data.data,
             dataType: 'json',
-            xhrFields: {
-                withCredentials: true
-            },
+            // xhrFields: {
+            //     withCredentials: true
+            // },
             crossDomain: true,
             type: data.type || "GET",
             success: function () {
