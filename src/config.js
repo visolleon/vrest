@@ -52,10 +52,10 @@
                         p.success && p.success(jdata);
                     } catch (e) {
                         console.error("server data error:", e);
-                        p.error && p.error(xhr);
+                        p.error && p.error(xhr, p);
                     }
                 } else {
-                    p.error && p.error(xhr);
+                    p.error && p.error(xhr, p);
                 }
                 p.complete && p.complete();
             };
@@ -128,7 +128,7 @@
         ajax({
             url: [remoteConfig._config.host, '/', data.path].join(''),
             data: data.data,
-            dataType: 'json',
+            dataType: data.dataType || 'json',
             // xhrFields: {
             //     withCredentials: true
             // },

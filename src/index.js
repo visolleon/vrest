@@ -93,35 +93,43 @@
                 t._op.before && t._op.before.apply(params, null);
 
                 // var act = (method == 'POST') ? config.server.post : config.server.get;
-                config.server.send(url, method, params, function (data) {
-                    t._op.success && t._op.success.call(t, data);
-                    var ret = data;
-                    if (meta.cache) {
-                        t.meta._cacheData[dataKay] = data;
-                        // 超时更新
-                        if (meta.timeout) {
-                            var timeout = parseInt(meta.timeout) || 60 * 1000 * 5;
-                            setTimeout(function () {
-                                var c = new MetaClass(meta)
-                                c.clear();
-                                var argsArr = [];
-                                if (meta.autoUpdate) {
-                                    for (var k in params) {
-                                        argsArr.push(params[k]);
+
+                config.server.ajax({
+                    path: url,
+                    type: method,
+                    data: params,
+                    success: function (data) {
+                        t._op.success && t._op.success.call(t, data);
+                        var ret = data;
+                        if (meta.cache) {
+                            t.meta._cacheData[dataKay] = data;
+                            // 超时更新
+                            if (meta.timeout) {
+                                var timeout = parseInt(meta.timeout) || 60 * 1000 * 5;
+                                setTimeout(function () {
+                                    var c = new MetaClass(meta)
+                                    c.clear();
+                                    var argsArr = [];
+                                    if (meta.autoUpdate) {
+                                        for (var k in params) {
+                                            argsArr.push(params[k]);
+                                        }
+                                        c.exec.apply(t, argsArr);
                                     }
-                                    c.exec.apply(t, argsArr);
-                                }
-                            }, timeout);
+                                }, timeout);
+                            }
                         }
+                        if (meta.run) {
+                            ret = meta.run.call(t, data);
+                        }
+                        t._op.ok && t._op.ok.call(t, ret);
+                    },
+                    error: function (xhr) {
+                        t._op.error && t._op.error(xhr.status, xhr.responseJSON, params);
+                    },
+                    complete: function () {
+                        t._op.complete && t._op.complete();
                     }
-                    if (meta.run) {
-                        ret = meta.run.call(t, data);
-                    }
-                    t._op.ok && t._op.ok.call(t, ret);
-                }, function (xhr) {
-                    t._op.error && t._op.error(xhr.status, xhr.responseJSON);
-                }, function () {
-                    t._op.complete && t._op.complete();
                 });
             }, 0);
             return t;
@@ -300,7 +308,7 @@
                 try {
                     return JSON.parse(data);
                 } catch (e) {
-                    console.error("cache get error:", e);
+                    console.warn("cache data is not json:", name, data);
                 }
             }
             return data;
