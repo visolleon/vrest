@@ -69,9 +69,14 @@
                 sendData.push([k, p.data[k]].join("="));
             }
             // 设置通用数据
-            if(remoteConfig._config.data) {
-                for(var k in remoteConfig._config.data) {
-                    sendData.push([k, remoteConfig._config.data[k]].join("="));
+            if (remoteConfig._config.data) {
+                for (var k in remoteConfig._config.data) {
+                    var keyDate = remoteConfig._config.data[k];
+                    if (typeof keyDate == "function") {
+                        sendData.push([k, keyDate()].join("="));
+                    } else {
+                        sendData.push([k, keyDate].join("="));
+                    }
                 }
             }
 
