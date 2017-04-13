@@ -47,12 +47,11 @@
             xhr.onload = function (e) {
                 var xhr = e.currentTarget;
                 if (xhr.status == 200) {
-                    try {
+                    if (p.dataType == "json") {
                         var jdata = JSON.parse(xhr.response);
                         p.success && p.success(jdata);
-                    } catch (e) {
-                        console.error("server data error:", e);
-                        p.error && p.error(xhr, p);
+                    } else {
+                        p.success && p.success(xhr.response);
                     }
                 } else {
                     p.error && p.error(xhr, p);
