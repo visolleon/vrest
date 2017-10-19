@@ -5,6 +5,8 @@
 
     remoteConfig._config = {
         host: "",
+        // 是否跨域
+        crossDomain: true,
         // 通用发送的数据
         data: []
     };
@@ -129,14 +131,10 @@
      * @private
      */
     remoteConfig.server.ajax = function (data) {
-        ajax({
+        var params = {
             url: [remoteConfig._config.host, '/', data.path].join(''),
             data: data.data,
             dataType: data.dataType || 'json',
-            // xhrFields: {
-            //     withCredentials: true
-            // },
-            crossDomain: true,
             type: data.type || "GET",
             success: function () {
                 data.success && data.success.apply(this, arguments);
@@ -148,7 +146,15 @@
             complete: function () {
                 data.complete && data.complete.apply(this, arguments);
             }
-        });
+        };
+
+        if (remoteConfig._configcrossDomain) {
+            params.xhrFields = {
+                withCredentials: true
+            };
+            params.crossDomain = true;
+        }
+        ajax(params);
     };
 
     /**
