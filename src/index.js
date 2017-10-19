@@ -244,6 +244,15 @@
         }
     };
 
+    // 注册Model的Meta
+    remote.registerSingle = function (key, meta) {
+        if (!remote[key]) {
+            __metaCall(remote, key, meta);
+        } else {
+            console.warn("duplicate meta register:", key);
+        }
+    };
+
     // URL处理
     remote.url = {
 
