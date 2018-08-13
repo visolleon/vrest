@@ -1,6 +1,6 @@
-(function () {
+(function (wind) {
 
-    var $$ = window.$$ || {};
+    var $$ = wind.$$ || {};
     var remoteConfig = {};
 
     remoteConfig._config = {
@@ -20,20 +20,67 @@
     remoteConfig.server = {};
 
     var ajax = function (p) {
-        var xhr = new XMLHttpRequest();
-        if (p.url) {
-            p.type = p.type || "get";
-            if (p.type && p.type.toUpperCase() == 'POST') {
-                p.type = 'POST';
-            } else if (p.type && p.type.toUpperCase() == 'UPDATE') {
-                p.type = 'UPDATE';
-            } else if (p.type && p.type.toUpperCase() == 'DELETE') {
-                p.type = "DELETE";
-            } else if (p.type && p.type.toUpperCase() == 'PUT') {
-                p.type = 'PUT';
+        if (!p.url) {
+            console.error("url is invalid.");
+            return;
+        }
+        p.type = p.type || "get";
+        if (p.type && p.type.toUpperCase() == 'POST') {
+            p.type = 'POST';
+        } else if (p.type && p.type.toUpperCase() == 'UPDATE') {
+            p.type = 'UPDATE';
+        } else if (p.type && p.type.toUpperCase() == 'DELETE') {
+            p.type = "DELETE";
+        } else if (p.type && p.type.toUpperCase() == 'PUT') {
+            p.type = 'PUT';
+        } else {
+            p.type = 'GET';
+        }
+
+        if (p.beforeSend) {
+            p.beforeSend();
+        }
+
+        p.dataType = (p.dataType || "").toLowerCase();
+        p.headers = {};
+        if (!p.headers["Content-Type"]) {
+            if (p.dataType == "json") {
+                p.headers["Content-Type"] = "application/x-www-form-urlencoded";
             } else {
-                p.type = 'GET';
+                p.headers["Content-Type"] = "text/plain";
             }
+        }
+        p.headers["Accept"] = "application/json, text/javascript, */*";
+
+        if (!p.crossDomain && !p.headers["X-Requested-With"]) {
+            p.headers["X-Requested-With"] = "XMLHttpRequest";
+        }
+
+        if (wx && wx.request) {
+            if (remoteConfig._config.data) {
+                for (var k in remoteConfig._config.data) {
+                    var keyDate = remoteConfig._config.data[k];
+                    if (typeof keyDate == "function") {
+                        p.data[k] = keyDate();
+                    } else {
+                        p.data[k] = keyDate;
+                    }
+                }
+            }
+            wx.request({
+                url: p.url,
+                data: p.data,
+                method: p.type,
+                dataType: p.dataType,
+                header: p.headers,
+                success: function (d) {
+                    p.success && p.success(d.data);
+                },
+                fail: p.error,
+                complete: p.complete
+            });
+        } else {
+            var xhr = new XMLHttpRequest();
             if (p.async) {
                 p.async = true;
             } else {
@@ -61,10 +108,6 @@
                 p.complete && p.complete();
             };
 
-            if (p.beforeSend) {
-                p.beforeSend();
-            }
-
             var sendData = [];
             for (var k in p.data) {
                 sendData.push([k, p.data[k]].join("="));
@@ -90,21 +133,6 @@
             }
             // xhr.open(p.type, p.url, p.async);
             xhr.open(p.type, p.url);
-
-            p.headers = {};
-
-            if (!p.headers["Content-Type"]) {
-                if (p.dataType == "json") {
-                    p.headers["Content-Type"] = "application/x-www-form-urlencoded";
-                } else {
-                    p.headers["Content-Type"] = "text/plain";
-                }
-            }
-            p.headers["Accept"] = "application/json, text/javascript, */*";
-
-            if (!p.crossDomain && !p.headers["X-Requested-With"]) {
-                p.headers["X-Requested-With"] = "XMLHttpRequest";
-            }
 
             for (var k in p.headers) {
                 xhr.setRequestHeader(k, p.headers[k]);
@@ -218,5 +246,5 @@
     };
 
     $$._config = remoteConfig;
-    window.$$ = window.vRest = $$;
-})();
+    wind.$$ = wind.vRest = $$;
+})(window);

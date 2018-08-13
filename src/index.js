@@ -1,5 +1,5 @@
-(function () {
-    var remote = window.$$ || {};
+(function (wind) {
+    var remote = wind.$$ || {};
     var config = remote._config;
 
     var MetaClass = function (meta) {
@@ -267,7 +267,7 @@
 
     // 本地缓存
     remote.cache = {
-        storage: window.localStorage,
+        storage: wind.localStorage,
 
         // 设置缓存数据
         set: function (name, data) {
@@ -324,5 +324,5 @@
         }
     };
 
-    window.$$ = window.vRest = remote;
-})();
+    wind.$$ = wind.vRest = remote;
+})(window);
