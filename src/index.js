@@ -256,12 +256,11 @@
     // URL处理
     remote.url = {
 
-        queryString: document.location.search,
+        queryString: document ? (document.location ? document.location.search : "") : "",
 
         // 查询Key值
         query: function (key) {
-            return decodeURIComponent((this.queryString.match(new
-                RegExp("(?:^\\?|&)" + key + "=(.*?)(?=&|$)")) || ['', ''])[1]);
+            return decodeURIComponent((this.queryString.match(new RegExp("(?:^\\?|&)" + key + "=(.*?)(?=&|$)")) || ['', ''])[1]);
         }
     };
 
@@ -280,7 +279,7 @@
             } else {
                 var exdate = new Date();
                 exdate.setDate(exdate.getDate() + 30);
-                document.cookie = name + "=" + escape(str) + ";expires=" + exdate.toGMTString();// + ";path=/";
+                document.cookie = name + "=" + escape(str) + ";expires=" + exdate.toGMTString(); // + ";path=/";
             }
         },
 
@@ -324,5 +323,8 @@
         }
     };
 
-    wind.$$ = wind.vRest = remote;
-})(window);
+    wind.$$ = wind.VRest = remote;
+    if (module) {
+        module.exports = remote;
+    }
+})(window || {});

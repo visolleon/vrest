@@ -246,5 +246,5 @@
     };
 
     $$._config = remoteConfig;
-    wind.$$ = wind.vRest = $$;
-})(window);
+    wind.$$ = wind.VRest = $$;
+})(window || {});
