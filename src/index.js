@@ -19,8 +19,6 @@
 
     remoteConfig.server = {};
 
-    var wx = wind.wx;
-
     var ajax = function (p) {
         if (!p.url) {
             console.error("url is invalid.");
