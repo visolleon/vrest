@@ -209,3 +209,35 @@ $$.info.clear().exec().before(function () {
     console.error("ajax error");
 });
 ```
+
+TODO计划:
+
+```javascript
+$$.register({
+    info: {
+        url: "base/info",
+        cache: true,
+        timeout: 60 * 1000, // 缓存超时设置
+        autoUpdate: true,
+        params: {
+            id: {type: "string", default: "123"},
+            size: {type: "number", default: 10}, // 每页数目
+            page: {type: "number", default: 1} // 分页数 
+        },
+        methods: ['GET']
+    }
+});
+
+var dataObj = $$.info.set({
+    id: "123",
+    size: 10
+});
+
+dataObj.page(2).ok((data) => {
+    console.log(data);
+});
+
+dataObj.page(3).size(20).ok((data) => {
+    console.log(data);
+});
+```
