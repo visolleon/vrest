@@ -241,3 +241,7 @@ dataObj.page(3).size(20).ok((data) => {
     console.log(data);
 });
 ```
+
+
+## LICENSE
+[MIT](LICENSE)
